@@ -1,4 +1,4 @@
-import com.sun.org.apache.bcel.internal.generic.RETURN;
+package lox;
 
 public enum TokenType {
     // Single-character tokens.

@@ -1,4 +1,5 @@
-import jdk.nashorn.internal.parser.Token;
+package lox;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.util.List;
 public class Lox {
     static boolean hadError = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if(args.length > 1) {
             System.out.println("Usage: jlox [script]");
             System.exit(64);
@@ -32,7 +33,7 @@ public class Lox {
 
         run(new String(bytes, Charset.defaultCharset()));
 
-        // 出错：报错推出
+        // 出错：报错退出
         if(hadError) System.exit(65);
     }
 
@@ -41,7 +42,7 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
 
         for(;;) {
-            System.out.println("> ");
+            System.out.print("> ");
             String line = reader.readLine();
             if(line == null) break;
             run(line);
