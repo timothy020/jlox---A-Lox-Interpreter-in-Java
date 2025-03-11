@@ -6,6 +6,8 @@ import java.util.List;
 import static com.craftinginterpreters.lox.TokenType.*;
 
 public class Parser {
+    private static class ParseError extends RuntimeException {}
+
     private final List<Token> tokens;
     private int current = 0;
 
@@ -13,27 +15,35 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    private Expr expression() {
-        return equity();
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        }
     }
-    private Expr equity() {
+
+    private Expr expression() {
+        return equality();
+    }
+    private Expr equality() {
         Expr expr = comparison();
-        expr = parseRecursive(Arrays.asList(BANG_EQUAL, EQUAL_EQUAL));
+        expr = parseRecursive(expr, Arrays.asList(BANG_EQUAL, EQUAL_EQUAL));
         return expr;
     }
     private Expr comparison() {
         Expr expr = term();
-        expr = parseRecursive(Arrays.asList(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL));
+        expr = parseRecursive(expr, Arrays.asList(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL));
         return expr;
     }
     private Expr term() {
         Expr expr = factor();
-        expr = parseRecursive(Arrays.asList(MINUS, PLUS));
+        expr = parseRecursive(expr, Arrays.asList(MINUS, PLUS));
         return expr;
     }
     private Expr factor() {
         Expr expr = unary();
-        expr = parseRecursive(Arrays.asList(SLASH, STAR));
+        expr = parseRecursive(expr, Arrays.asList(SLASH, STAR));
         return expr;
     }
     private Expr unary() {
@@ -58,16 +68,17 @@ public class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+
+        throw error(peek(), "Expect expression.");
      }
 
     /**
      * private tool methods
      */
 
-    private Expr parseRecursive(List<TokenType> types) {
+    private Expr parseRecursive(Expr expr, List<TokenType> types) {
         TokenType[] matchTypes = types.toArray(new TokenType[0]);
 
-        Expr expr = null;
         while (match(matchTypes)) {
             // left-associative【这就是为什么会“短路”】
             Token operator = previous();
@@ -86,6 +97,12 @@ public class Parser {
             }
         }
         return false;
+    }
+
+    private Token consume(TokenType type, String message) {
+        if (check(type)) return advance();
+
+        throw error(peek(), message);
     }
 
     private boolean check(TokenType type) {
@@ -109,4 +126,32 @@ public class Parser {
     private Token previous() {
         return tokens.get(current - 1);
     }
+
+    // 错误处理相关
+    private ParseError error(Token token, String message) {
+        Lox.error(token, message);
+        return new ParseError();
+    }
+    private void synchronize() {
+        advance();
+
+        while (!isAtEnd()) {
+            if (previous().type == SEMICOLON) return;
+
+            switch (peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+            }
+
+            advance();
+        }
+    }
+
 }
