@@ -1,5 +1,6 @@
 package com.craftinginterpreters.lox;
 
+// Parser 的 Visitor访问类：打印结点
 public class AstPrinter implements Expr.Visitor<String>{
     String print(Expr expr) {
         return expr.accept(this);
