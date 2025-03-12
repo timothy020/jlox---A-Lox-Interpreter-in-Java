@@ -15,6 +15,7 @@ public class Parser {
         this.tokens = tokens;
     }
 
+    // wrapper：对外暴露的接口
     Expr parse() {
         try {
             return expression();
