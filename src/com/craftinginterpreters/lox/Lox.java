@@ -13,6 +13,7 @@ import java.util.List;
 import static com.craftinginterpreters.lox.TokenType.EOF;
 
 public class Lox {
+    private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
 
@@ -38,6 +39,7 @@ public class Lox {
 
         // 出错：报错退出
         if(hadError) System.exit(65);
+        if(hadRuntimeError) System.exit(70);
     }
 
     private static void runPrompt() throws IOException {
@@ -57,17 +59,20 @@ public class Lox {
 
     // 核心方法
     private static void run(String source) {
+        // Scanning
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
+        // Parsing
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
 
         //stop if there was a syntax error
-        if(hadError) System.exit(65);
-        if(hadRuntimeError) System.exit(70);
+        if(hadError) return;
+//        System.out.println(new AstPrinter().print(expression));
 
-        System.out.println(new AstPrinter().print(expression));
+        // Executing
+        interpreter.interpret(expression);
     }
 
     /**
