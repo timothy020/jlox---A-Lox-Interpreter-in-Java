@@ -1,17 +1,42 @@
 package com.craftinginterpreters.lox;
 
+import java.util.List;
+
 // Parser 的 Visitor访问类：计算结点
-public class Interpreter implements Expr.Visitor<Object>{
-    // wrapper：对外暴露的接口
-    void interpret(Expr expr) {
+public class Interpreter implements
+        Stmt.Visitor<Void>,
+        Expr.Visitor<Object>{
+    /**
+     * wrapper：对外暴露的接口
+      */
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expr);
-            System.out.println(stringify(value));
+            for(Stmt statement : statements) {
+                excute(statement);
+            }
         } catch (RunTimeError error) {
             Lox.runtimeError(error);
         }
     }
-
+    /**
+     * About Statement
+     */
+    private void excute(Stmt stmt) {
+        stmt.accept(this);
+    }
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+    @Override public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+    /**
+     * About Expression
+     */
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }

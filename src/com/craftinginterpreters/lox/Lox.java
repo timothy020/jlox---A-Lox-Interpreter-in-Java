@@ -65,16 +65,15 @@ public class Lox {
 
         // Parsing
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         //stop if there was a syntax error
         if(hadError) return;
 //        System.out.println(new AstPrinter().print(expression));
 
         // Executing
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
-
     /**
      * Error handling：核心思想是Lox定义方法，部件调用方法来向上传递错误信息
       */

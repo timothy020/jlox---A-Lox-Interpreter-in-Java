@@ -1,5 +1,6 @@
 package com.craftinginterpreters.lox;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,15 +16,38 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    // wrapper：对外暴露的接口
-    Expr parse() {
-        try {
-            return expression();
-        } catch (ParseError error) {
-            return null;
+    /**
+     * wrapper：对外暴露的接口
+     */
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(statement());
         }
+        return statements;
     }
 
+    /**
+     * About Statement
+     */
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+        return expressionStatement();
+    }
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
+    /**
+     * About Expression
+     */
     private Expr expression() {
         return equality();
     }
