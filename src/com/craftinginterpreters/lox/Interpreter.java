@@ -6,6 +6,9 @@ import java.util.List;
 public class Interpreter implements
         Stmt.Visitor<Void>,
         Expr.Visitor<Object>{
+
+    private Environment environment = new Environment();
+
     /**
      * wrapper：对外暴露的接口
       */
@@ -29,9 +32,20 @@ public class Interpreter implements
         evaluate(stmt.expression);
         return null;
     }
-    @Override public Void visitPrintStmt(Stmt.Print stmt) {
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
+        return null;
+    }
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+
+        environment.define(stmt.name.lexeme, value);
         return null;
     }
     /**
@@ -61,6 +75,10 @@ public class Interpreter implements
 
         // Unreachable
         return null;
+    }
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        return environment.get(expr.name);
     }
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
