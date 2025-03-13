@@ -72,7 +72,24 @@ public class Parser {
      * About Expression
      */
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+    // 右结合，支持a=b=c；递归实现，有点tricky
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if (match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
     }
     private Expr equality() {
         Expr expr = comparison();
