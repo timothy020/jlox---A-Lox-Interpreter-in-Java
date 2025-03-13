@@ -60,6 +60,13 @@ public class Interpreter implements
         return null;
     }
     @Override
+    public Void visitWhileStmt(Stmt.While stmt) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            excute(stmt.body);
+        }
+        return null;
+    }
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
