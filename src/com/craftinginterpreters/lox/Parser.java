@@ -54,12 +54,14 @@ public class Parser {
     }
 
     private Stmt statement() {
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
     }
+
     private Stmt ifStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'if'.");
         Expr condition = expression();
@@ -80,6 +82,50 @@ public class Parser {
         Stmt body = statement();
 
         return new Stmt.While(condition, body);
+    }
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        // first clause: initializer
+        Stmt initializer;
+        if(match(SEMICOLON)) {
+            initializer = null;
+        } else if(match(VAR)) {
+            initializer = varDeclaration();
+        } else {
+            initializer = expressionStatement();
+        }
+
+        // second clause: condition
+        Expr condition = null;
+        if ( !check(SEMICOLON)) {
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after condition.");
+
+        // third clause: increment
+        Expr increment = null;
+        if ( !check(RIGHT_PAREN)) {
+            increment = expression();
+        }
+        consume(RIGHT_PAREN, "Expect ')' after increment.");
+
+        Stmt body = statement();
+
+        // 构造为 while-loop: body后加increment，前加initializer
+        if (increment != null) {
+            body = new Stmt.Block(
+                    Arrays.asList(body, new Stmt.Expression(increment)));
+        }
+        if (condition == null) {
+            condition = new Expr.Literal(true);
+        }
+        // 确保了initializer只执行一次
+        body = new Stmt.While(condition, body);
+        if (initializer != null) {
+            body = new Stmt.Block(Arrays.asList(initializer, body));
+        }
+        return body;
     }
     private Stmt printStatement() {
         Expr value = expression();
