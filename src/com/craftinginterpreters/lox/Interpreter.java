@@ -27,6 +27,24 @@ public class Interpreter implements
     private void excute(Stmt stmt) {
         stmt.accept(this);
     }
+    void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+        try {
+            // 新建一个environment用于执行block中的语句
+            this.environment = environment;
+
+            for (Stmt statement : statements) {
+                excute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         evaluate(stmt.expression);
