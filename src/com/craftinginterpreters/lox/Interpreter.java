@@ -51,6 +51,15 @@ public class Interpreter implements
         return null;
     }
     @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            excute(stmt.thenBranch);
+        } else if (stmt.elseBranch != null) {
+            excute(stmt.elseBranch);
+        }
+        return null;
+    }
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
