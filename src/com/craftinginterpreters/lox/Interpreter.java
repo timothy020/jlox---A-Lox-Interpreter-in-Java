@@ -8,7 +8,26 @@ public class Interpreter implements
         Stmt.Visitor<Void>,
         Expr.Visitor<Object>{
 
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    private Environment environment = globals ;
+
+    Interpreter() {
+        globals.define("clock", new LoxCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+            @Override
+            public Object call(Interpreter interpreter,
+                               List<Object> arguments) {
+                return System.currentTimeMillis() / 1000.0;
+            }
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+    }
 
     /**
      * wrapper：对外暴露的接口
@@ -177,12 +196,20 @@ public class Interpreter implements
             arguments.add(evaluate(argument));
         }
 
+        // Check type
         if (!(callee instanceof LoxCallable)) {
             throw new RunTimeError(expr.paren,
                     "Can only call functions and classes.");
         }
 
         LoxCallable function = (LoxCallable)callee;
+
+        // check arity
+        if (function.arity() != arguments.size()) {
+            throw new RunTimeError(expr.paren,
+                    "Expected " + function.arity() + " arguments but got " +
+                            arguments.size() + ".");
+        }
         return function.call(this, arguments);
     }
 
