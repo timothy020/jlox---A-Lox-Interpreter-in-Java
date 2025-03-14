@@ -1,3 +1,5 @@
-var a = clock();
+fun sayHi(first, last) {
+    print "Hi, " + first + " " + last + "!";
+}
 
-print a;
+sayHi("Dear", "Reader");
