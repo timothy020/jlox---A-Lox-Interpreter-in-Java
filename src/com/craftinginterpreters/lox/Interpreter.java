@@ -73,7 +73,7 @@ public class Interpreter implements
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
         // 在environment 添加 <name, Function>
-        LoxFunction function = new LoxFunction(stmt);
+        LoxFunction function = new LoxFunction(stmt, environment);
         environment.define(stmt.name.lexeme, function);
         return null;
     }

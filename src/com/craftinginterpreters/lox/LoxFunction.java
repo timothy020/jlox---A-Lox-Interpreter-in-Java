@@ -4,7 +4,10 @@ import java.util.List;
 
 public class LoxFunction implements LoxCallable{
     private final Stmt.Function declaration;
-    LoxFunction (Stmt.Function declaration) {
+    private final Environment   closure;
+
+    LoxFunction (Stmt.Function declaration, Environment closure) {
+        this.closure = closure;
         this.declaration = declaration;
     }
     @Override
@@ -14,7 +17,7 @@ public class LoxFunction implements LoxCallable{
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
         // Each Function Call has its own environment. Otherwise, recursion would break.
-        Environment environment = new Environment(interpreter.globals);
+        Environment environment = new Environment(closure);
         // Bind Parameter and Argument
         for (int i = 0; i < declaration.params.size(); i++) {
             environment.define(
