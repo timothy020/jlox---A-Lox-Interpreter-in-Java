@@ -9,6 +9,8 @@ public class Resolver implements
         Expr.Visitor<Void>, Stmt.Visitor<Void>{
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+    private FunctionType currentFunction = FunctionType.NONE;
+    private enum FunctionType { NONE, FUNCTION }
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -37,6 +39,12 @@ public class Resolver implements
         if (scopes.isEmpty()) return;
 
         Map<String, Boolean> scope = scopes.peek();
+        // Error Handling： 避免重复声明变量
+        if (scope.containsKey(name.lexeme)) {
+            Lox.error(name,
+                    "Already a variable with this name in this scope.");
+        }
+
         scope.put(name.lexeme, false);
     }
     private void define(Token name) {
@@ -51,7 +59,10 @@ public class Resolver implements
             }
         }
     }
-    private void resolveFunction(Stmt.Function function) {
+    private void resolveFunction(Stmt.Function function, FunctionType type) {
+        FunctionType enclosingFunction = currentFunction;
+        currentFunction = type;
+
         beginScope();
         for (Token param : function.params) {
             declare(param);
@@ -59,6 +70,8 @@ public class Resolver implements
         }
         resolve(function.body);
         endScope();
+
+        currentFunction = enclosingFunction;
     }
 
     @Override
@@ -99,7 +112,7 @@ public class Resolver implements
         declare(function.name);
         define(function.name);
 
-        resolveFunction(function);
+        resolveFunction(function, FunctionType.FUNCTION);
         return null;
     }
 
@@ -124,6 +137,10 @@ public class Resolver implements
     }
     @Override
     public Void visitReturnStmt(Stmt.Return stmt) {
+        if(currentFunction == FunctionType.NONE) {
+            Lox.error(stmt.keyword, "Can't return from top-level code.");
+        }
+
         if (stmt.value != null) {
             resolve(stmt.value);
         }

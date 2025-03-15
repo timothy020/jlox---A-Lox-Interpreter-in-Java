@@ -1,10 +1,8 @@
-var a = "global";
-{
-    fun showA() {
-        print a;
-    }
-    showA();
-    var a = "block";
-    showA();
-    print a;
+// example 1: 重复声明变量
+fun bad() {
+    var a = "first";
+    var a = "second";
 }
+
+//example 2: 无效return
+return "error return";
