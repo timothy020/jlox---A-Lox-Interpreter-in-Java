@@ -49,7 +49,7 @@ public class Parser {
         consume(LEFT_BRACE, "Expect '{' before class body");
 
         ArrayList<Stmt.Function> methods = new ArrayList<>();
-        while(!check(RIGHT_PAREN) && !isAtEnd()) {
+        while(!check(RIGHT_BRACE) && !isAtEnd()) {
             methods.add(function("method"));
         }
         consume(RIGHT_BRACE, "Expect '}' after class body.");

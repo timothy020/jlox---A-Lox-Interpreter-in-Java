@@ -1,8 +1,5 @@
-// example 1: 重复声明变量
-fun bad() {
-    var a = "first";
-    var a = "second";
-}
+class Bagel {}
 
-//example 2: 无效return
-return "error return";
+var bagel = Bagel();
+
+print bagel; // Prints "Bagel instance".
