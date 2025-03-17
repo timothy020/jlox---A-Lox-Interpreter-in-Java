@@ -10,7 +10,7 @@ public class Resolver implements
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
-    private enum FunctionType { NONE, FUNCTION }
+    private enum FunctionType { NONE, FUNCTION, METHOD}
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -85,6 +85,12 @@ public class Resolver implements
     public Void visitClassStmt(Stmt.Class stmt) {
         declare(stmt.name);
         define(stmt.name);
+
+        for(Stmt.Function method : stmt.methods) {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(method, declaration);
+        }
+
         return null;
     }
     @Override
