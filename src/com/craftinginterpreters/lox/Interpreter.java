@@ -255,6 +255,27 @@ public class Interpreter implements
         }
         return function.call(this, arguments);
     }
+    @Override
+    public Object visitGetExpr(Expr.Get expr) {
+        Object object = evaluate(expr.object);
+        if (object instanceof LoxInstance) {
+            return ((LoxInstance)object).get(expr.name);
+        }
+
+        throw new RunTimeError(expr.name, "Only instances have properties.");
+    }
+    @Override
+    public Object visitSetExpr(Expr.Set expr) {
+        Object object = evaluate(expr.object);
+
+        if (!(object instanceof LoxInstance)) {
+            throw new RunTimeError(expr.name, "Only instances have fields.");
+        }
+
+        Object value = evaluate(expr.value);
+        ((LoxInstance)object).set(expr.name, value);
+        return value;
+    }
 
     private void checkNumberOperands(Token operator, Object operand) {
         if (operand instanceof Double) return;
