@@ -283,6 +283,10 @@ public class Interpreter implements
         ((LoxInstance)object).set(expr.name, value);
         return value;
     }
+    @Override
+    public Object visitThisExpr(Expr.This expr) {
+        return lookUpVariable(expr.keyword, expr);
+    }
 
     private void checkNumberOperands(Token operator, Object operand) {
         if (operand instanceof Double) return;

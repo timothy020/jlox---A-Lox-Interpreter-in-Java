@@ -86,11 +86,15 @@ public class Resolver implements
         declare(stmt.name);
         define(stmt.name);
 
+        beginScope();
+        scopes.peek().put("this", true);
+
         for(Stmt.Function method : stmt.methods) {
             FunctionType declaration = FunctionType.METHOD;
             resolveFunction(method, declaration);
         }
 
+        endScope();
         return null;
     }
     @Override
@@ -102,6 +106,12 @@ public class Resolver implements
     public Void visitSetExpr(Expr.Set expr) {
         resolve(expr.value);
         resolve(expr.object);
+        return null;
+    }
+    @Override
+    public Void visitThisExpr(Expr.This expr) {
+        // like any other local variable using “this” as the name for the “variable”.
+        resolveLocal(expr, expr.keyword);
         return null;
     }
     @Override
