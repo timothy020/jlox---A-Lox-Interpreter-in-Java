@@ -13,7 +13,7 @@ public class Resolver implements
     private FunctionType currentFunction = FunctionType.NONE;
     private ClassType currentClass = ClassType.NONE;
 
-    private enum FunctionType { NONE, FUNCTION, METHOD}
+    private enum FunctionType { NONE, FUNCTION, INITIALIZER, METHOD}
     private enum ClassType    { NONE, CLASS }
 
     Resolver(Interpreter interpreter) {
@@ -93,6 +93,7 @@ public class Resolver implements
         declare(stmt.name);
         define(stmt.name);
 
+        // 包裹一个this environment
         beginScope();
         scopes.peek().put("this", true);
 
@@ -189,6 +190,10 @@ public class Resolver implements
         }
 
         if (stmt.value != null) {
+            if(currentFunction != FunctionType.INITIALIZER) {
+                Lox.error(stmt.keyword,
+                        "Can't return a value from an initializer.");
+            }
             resolve(stmt.value);
         }
 

@@ -78,7 +78,8 @@ public class Interpreter implements
         Map<String, LoxFunction> methods = new HashMap<>();
         for (Stmt.Function method : stmt.methods) {
             methods.put(method.name.lexeme,
-                    new LoxFunction(method, environment));
+                    new LoxFunction(method, environment,
+                            method.name.lexeme.equals("init")));
         }
 
         LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
@@ -93,7 +94,7 @@ public class Interpreter implements
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
         // 在environment 添加 <name, Function>
-        LoxFunction function = new LoxFunction(stmt, environment);
+        LoxFunction function = new LoxFunction(stmt, environment,false);
         environment.define(stmt.name.lexeme, function);
         return null;
     }

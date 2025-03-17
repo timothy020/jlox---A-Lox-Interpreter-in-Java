@@ -1,7 +1,11 @@
-class Bacon {
-    eat() {
-        print "Crunch crunch crunch!";
+class Foo {
+    init() {
+        print this; // 支持this
+        print "This is Initializer";
     }
 }
-
-Bacon().eat(); // Prints "Crunch crunch crunch!".
+// 初始化时 调用init
+var foo = Foo();
+// 主动调用init
+// init返回this，打印this：打印类名
+print foo.init();

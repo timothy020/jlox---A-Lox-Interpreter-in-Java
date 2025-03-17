@@ -18,6 +18,7 @@ public class LoxInstance {
 
         LoxFunction method = klass.findMethod(name.lexeme);
         if(method != null)  {
+            // 包裹一个this environment
             return method.bind(this);
         }
 
