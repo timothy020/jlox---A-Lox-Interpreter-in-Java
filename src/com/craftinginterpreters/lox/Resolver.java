@@ -99,8 +99,13 @@ public class Resolver implements
                     "A class can't inherit from itself.");
         }
 
+        // 处理父类: this 的外层再包裹一个 super environment
         if(stmt.superclass != null){
             resolve(stmt.superclass);
+        }
+        if (stmt.superclass != null) {
+            beginScope();
+            scopes.peek().put("super", true);
         }
 
         // 包裹一个this environment
@@ -113,6 +118,11 @@ public class Resolver implements
         }
 
         endScope();
+
+        if(stmt.superclass != null) {
+            endScope();
+        }
+
         currentClass = enclosingClass;
         return null;
     }
@@ -125,6 +135,11 @@ public class Resolver implements
     public Void visitSetExpr(Expr.Set expr) {
         resolve(expr.value);
         resolve(expr.object);
+        return null;
+    }
+    @Override
+    public Void visitSuperExpr(Expr.Super expr) {
+        resolveLocal(expr, expr.keyword);
         return null;
     }
     @Override

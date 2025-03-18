@@ -1,8 +1,13 @@
-class Foo {
-    greet() {
-        print "Hello, This is Foo.";
+class Doughnut {
+    cook() {
+        print "Fry until golden brown.";
     }
 }
-class Boo < Foo {
+class BostonCream < Doughnut {
+    cook() {
+        super.cook();
+        print "Pipe full of custard and coat with chocolate.";
+    }
 }
-Boo().greet();
+
+BostonCream().cook();
