@@ -1,8 +1,8 @@
 class Foo {
-    init() {
-        print this; // 支持this
-        print "This is Initializer";
+    greet() {
+        print "Hello, This is Foo.";
     }
 }
 class Boo < Foo {
 }
+Boo().greet();
