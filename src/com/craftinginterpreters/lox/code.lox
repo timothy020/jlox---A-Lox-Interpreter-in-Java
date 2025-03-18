@@ -1,13 +1,10 @@
+super.hello();  //报错
+
 class Doughnut {
     cook() {
+        super.cook(); // 报错
         print "Fry until golden brown.";
     }
 }
-class BostonCream < Doughnut {
-    cook() {
-        super.cook();
-        print "Pipe full of custard and coat with chocolate.";
-    }
-}
 
-BostonCream().cook();
+Doughnut().cook();
