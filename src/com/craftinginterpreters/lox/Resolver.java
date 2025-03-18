@@ -93,6 +93,16 @@ public class Resolver implements
         declare(stmt.name);
         define(stmt.name);
 
+        if(stmt.superclass != null
+                && stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+            Lox.error(stmt.superclass.name,
+                    "A class can't inherit from itself.");
+        }
+
+        if(stmt.superclass != null){
+            resolve(stmt.superclass);
+        }
+
         // 包裹一个this environment
         beginScope();
         scopes.peek().put("this", true);
